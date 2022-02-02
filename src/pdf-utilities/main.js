@@ -2,75 +2,87 @@ const puppeteer = require('puppeteer')
 const express = require("express");
 const app = express();
 const http = require('http');
+const handlebars = require("handlebars");
+const axios = require('axios');
+const fs = require('fs')
+const path = require('path');
 const server = http.createServer(app);
-const port = 3000;
-const fs = require('fs'); 
+const port = 5001;
+const { v4: uuidv4 } = require('uuid');
 
-let app = {
-    remoteUrl:"",
+
+let expressApp = {
+    remoteUrl:"http://teamchannelapi:5000/GetSpecificContent",
+    fileDir:"docs/",
     init:function(){
-
         app.get('/', (req, res) => {
-
+              return res.json('tatanga')
         });
 
         server.listen(port, () => {
-          console.log(`Server running at port ${port}`);
+          console.log('Server running at port ${port}');
         });
-          
-        app.get('/pdf_service', (req, res) => {
-          app.generatePDF(req, res);
+        
+        app.get('/pdfservice', (req, res) => {
+          expressApp.generatePDF(req, res);
         })
-
-    },generatePDF: async function(req, res){
+    },
+    generatePDF: async function(req, res){
       let token = req.query.token;
-      let fileNameTemplate = "{token}";
-      let uriEndfix = "?token={token}".replace("{token}", token);
-      let fileName = fileNameTemplate.replace("{token}", token)
-          
-      const path = configuration.filedir + fileName +'.pdf'
+      let uriEndfix = "?id={token}".replace("{token}", token);          
+      
+      const pdfResult = await expressApp.sendPdfContentRequest(token, uriEndfix);
+      if(pdfResult == null){
+          return res.status(404).send("Not found");
+      }
+      else{
+        var path = expressApp.fileDir + pdfResult +'.pdf'
+        res.contentType("application/pdf");
+        res.download(path, pdfResult); 
+      }
+    },
+    sendPdfContentRequest: async function(fileName, uri) {
+      console.log('START REQUEST');   
 
-      if (fs.existsSync(path)) {
-          res.contentType("application/pdf");
-          res.download(path, fileName); 
-      } else {
-        
-          const pdfResult = await app.sendPdfContentRequest(fileName, configuration.remoteUrlRouteTemplate + uriEndfix);
+          let browser = await puppeteer.launch({ 
+            headless: true, 
+            ignoreHTTPSErrors:true, ignoreDefaultArgs: ['--disable-extensions'],
+            executablePath: process.env.CHROMIUM_PATH,
+            args: ['--no-sandbox'],
+           });
 
-          if(pdfResult==null){
-              return  res.status(404).send("Not found");
-          }
-          else{
-            res.contentType("application/pdf");
-            res.download(path, fileName); 
-          }
-        
-      }     
-    },sendPdfContentRequest: async function(fileName, uri) {
-          const browser = await puppeteer.launch({ headless: true });
-          const page = await browser.newPage();
-            
-          await page.goto(configuration.remoteUrl + uri, 
+           let page = await browser.newPage();
+          console.log('START REQUEST: '+expressApp.remoteUrl + uri);   
+          var restData = await expressApp.getPDFDetail(expressApp.remoteUrl + uri);
+
+          if (!fs.existsSync(path.resolve(__dirname, 'docs')))
           {
-            waitUntil: 'networkidle0'
-          });
-        
-          let bodyHTML = await page.evaluate(() => document.body.innerHTML);
-        
-          if(bodyHTML==""){
-            return null
+            fs.mkdirSync('docs');
           }
-        
-          const pdf = await page.pdf(
+
+          var templateHtml =  fs.readFileSync(path.resolve(__dirname, 'template.html'), 'utf8');
+	        var template = handlebars.compile(templateHtml);
+	        var html = template(restData);
+          console.log(html);
+          page.setContent(html);
+          let fileUniqueId = uuidv4();
+          await page.pdf(
             {
               format: 'A4',
-              path: configuration.filedir + fileName + '.pdf'
+              path: expressApp.fileDir + fileUniqueId + '.pdf'
             });
         
           await browser.close();
         
-          return pdf
+          return fileUniqueId
+      },getPDFDetail: async function(url){
+        const resp = await axios({
+          url,
+          method: "GET"
+        });
+
+        return resp.data;
       }
     }
 
-app.init();
+    expressApp.init();

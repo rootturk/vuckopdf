@@ -8,40 +8,41 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       builder =>
                       {
-                          builder.WithOrigins("http://localhost:3000");
+                          builder.WithOrigins("http://localhost:3002");
+                          builder.WithOrigins("http://pdffactory:5001");
                       });
 });
 
 
 var app = builder.Build();
 app.UseCors(MyAllowSpecificOrigins);
-app.MapGet("/GetHtmlContent", async (string token) =>
-{
-    DataHelper.CreateData();
 
-    var file = await File.ReadAllLinesAsync("template.html");
+DataHelper.CreateData();
+
+app.MapGet("/GetSpecificContent", async (int id) =>
+{
     string cs = @"URI=file:storage.db";
 
-    using var con = new SQLiteConnection(cs);
-    con.Open();    
-    var res = con.Query<CityInfo>("SELECT * FROM CustomerInfo");
+    var dynamicParameters = new DynamicParameters();
+    dynamicParameters.Add("Id", id);
 
-    foreach(var item in res){
-        Console.WriteLine(item.City);
-    }
+    using var con = new SQLiteConnection(cs);
+    con.Open();  
+
+    var res = con.QueryFirst<CityInfo>("SELECT * FROM CustomerInfo WHERE Id = @Id", dynamicParameters);
     
-    return Results.Ok(file);
+    if(res==null)
+        return Results.NoContent();
+
+    return Results.Ok(res);
 });
 
 app.MapGet("/GetDocuments", async () =>
 {
-    DataHelper.CreateData();
-
-    var file = await File.ReadAllLinesAsync("template.html");
     string cs = @"URI=file:storage.db";
 
     using var con = new SQLiteConnection(cs);
-    con.Open();    
+    await con.OpenAsync();    
     var res = con.Query<CityInfo>("SELECT * FROM CustomerInfo");
 
     return Results.Ok(res);

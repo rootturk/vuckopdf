@@ -7,7 +7,7 @@ export default class DocumentFetcher extends React.Component {
       }
   
       componentDidMount() {
-        axios.get('https://localhost:7056/GetDocuments')
+        axios.get('http://localhost:5000/GetDocuments')
           .then(res => {
             const documents = res.data;
             console.log(res)
@@ -16,12 +16,14 @@ export default class DocumentFetcher extends React.Component {
       }
   
     render() {
+      let link ="http://localhost:5001/pdfservice?token={{token}}";
+      let url = "";
         return (
           <ul>
             {
               this.state.documents
                 .map(documents =>
-                  <li key={documents.id}>{documents.name}</li>
+                  <li key={documents.id}><a href={link.replace('{{token}}', documents.id)}>{documents.name}</a></li>
                 )
             }
           </ul>
