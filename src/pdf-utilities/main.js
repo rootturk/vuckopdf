@@ -15,11 +15,11 @@ let expressApp = {
     fileDir:"docs/",
     init:function(){
         app.get('/', (req, res) => {
-              return res.json('tatanga')
+              return res.json('Server running at port: '+ port)
         });
 
         server.listen(port, () => {
-          console.log('Server running at port ${port}');
+          console.log('Server running at port: '+ port)
         });
         
         app.get('/pdfservice', (req, res) => {
