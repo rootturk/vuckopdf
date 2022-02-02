@@ -10,7 +10,6 @@ const server = http.createServer(app);
 const port = 5001;
 const { v4: uuidv4 } = require('uuid');
 
-
 let expressApp = {
     remoteUrl:"http://teamchannelapi:5000/GetSpecificContent",
     fileDir:"docs/",
@@ -85,4 +84,4 @@ let expressApp = {
       }
     }
 
-    expressApp.init();
+expressApp.init();
