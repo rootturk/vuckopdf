@@ -13,37 +13,37 @@ public static class DataHelper{
     cmd.ExecuteNonQuery();
 
     cmd.CommandText = @"CREATE TABLE CustomerInfo(id INTEGER PRIMARY KEY,
-                Name TEXT, City TEXT)";
+                Name TEXT, City TEXT, Address TEXT)";
     cmd.ExecuteNonQuery();
 
-    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City) VALUES('John','Istanbul')";
+    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City, Address) VALUES('John Drake','Istanbul', 'KADIKOY, HALITAGA')";
     cmd.ExecuteNonQuery();
 
-    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City) VALUES('Jam', 'Ankara')";
+    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City, Address) VALUES('Jam Penny', 'Ankara','KADIKOY, RASIMPASA')";
     cmd.ExecuteNonQuery();
 
-    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City) VALUES('Sam','Izmir')";
+    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City, Address) VALUES('Sam Austin','Izmir','KADIKOY, MODA')";
     cmd.ExecuteNonQuery();
 
-    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City) VALUES('Pam', 'New Orleans')";
+    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City, Address) VALUES('Pam Angel', 'New Orleans','KADIKOY, HALITAGA')";
     cmd.ExecuteNonQuery();
 
-    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City) VALUES('Michael', 'New York')";
+    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City, Address) VALUES('Michael Dagger', 'New York','KADIKOY, HALITAGA')";
     cmd.ExecuteNonQuery();
 
-    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City) VALUES('Jannet', 'New Jersey')";
+    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City, Address) VALUES('Jannet Behindery', 'New Jersey','KADIKOY, HALITAGA')";
     cmd.ExecuteNonQuery();
 
-    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City) VALUES('Jason', 'New Holland')";
+    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City, Address) VALUES('Jason Peaker', 'New Holland','KADIKOY, HALITAGA')";
     cmd.ExecuteNonQuery();
 
-    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City) VALUES('Melbourne', 'Baku')";
+    cmd.CommandText = "INSERT INTO CustomerInfo(Name, City, Address) VALUES('Melbourne Keynes', 'Baku','KADIKOY, HALITAGA')";
     cmd.ExecuteNonQuery();
 
     Console.WriteLine("Table cars created");
 
-        cmd.CommandText = @"SELECT * FROM CustomerInfo";
-        cmd.ExecuteNonQuery();
+    cmd.CommandText = @"SELECT * FROM CustomerInfo";
+    cmd.ExecuteNonQuery();
 
     }
 }
